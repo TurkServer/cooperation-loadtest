@@ -5,13 +5,13 @@ sleep = Meteor.wrapAsync(function(time, cb) {
 });
 
 const num = 100;
-const batchId = "YDbzzJu6MBw36Es2n";
+const batchId = Meteor.settings.batchId;
 
 Meteor.startup(function() {
   const clients = [];
 
   for( let i = 0; i < num; i++ ) {
-    const client = DDP.connect("http://localhost:4000");
+    const client = DDP.connect("http://localhost:" + Meteor.settings.port);
 
     // Set up collections for this client
     client.users = new Mongo.Collection("users", { connection: client });
