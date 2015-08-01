@@ -92,12 +92,12 @@ function setupSubscriptions(client, group) {
     added: function(id, fields) {
       const index = fields.index;
 
-      console.log(`taking action for round ${index}`);
+      console.log(`${client.userId} in group ${group} is taking action for round ${index} on document ${id} with fields `, fields);
 
       try {
         client.call("chooseAction", Math.round(Math.random() + 1), index);
       } catch (e) {
-        console.log("Couldn't take action for ", fields);
+        console.log(`Couldn\'t take action for user ${client.userId} in group ${group} for round ${index} on document ${id} with fields`, fields, e);
       }
 
       if (index === 10) {
