@@ -103,11 +103,12 @@ function setupSubscriptions(client, group) {
         console.log(`Couldn\'t take action for user ${client.userId} in group ${group} for round ${index} on document ${id} with fields`, fields, e);
       }
 
-      if (index === 10) {
-        sleep(500);
-        client.call("goToLobby");
-      }
+    }
+  });
 
+  client.endHandle = client.Games.find({state: {$in: ['abandoned', 'finished']}}).observeChanges({
+    added: function(id, fields) {
+      client.call("goToLobby");
     }
   });
 }
@@ -119,4 +120,5 @@ function teardownSubscriptions(client) {
   }
 
   client.actionHandle && client.actionHandle.stop();
+  client.endHandle && client.endHandle.stop();
 }
