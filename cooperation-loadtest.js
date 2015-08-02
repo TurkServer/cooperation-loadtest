@@ -110,7 +110,7 @@ function setupSubscriptions(client, group) {
 }
 
 function teardownSubscriptions(client) {
-  for (let x in [ "userSub", "roundsSub", "actionsSub", "gameSub"]) {
+  for (let x of [ "userSub", "roundsSub", "actionsSub", "gameSub"]) {
     client[x] && client[x].stop();
     delete client[x];
   }
