@@ -92,9 +92,12 @@ function setupSubscriptions(client, group) {
     added: function(id, fields) {
       const index = fields.index;
 
-      console.log(`${client.userId} in group ${group} is taking action for round ${index} on document ${id} with fields `, fields);
-
       try {
+        var maxSleep = 2000;
+        var minSleep = 1000;
+        var sleepAmt = Math.floor(Math.random() * (maxSleep - minSleep)) + minSleep;
+        //sleep(sleepAmt);
+        console.log(`${client.userId} in group ${group} is taking action for round ${index} on document ${id} with fields `, fields);
         client.call("chooseAction", Math.round(Math.random() + 1), index);
       } catch (e) {
         console.log(`Couldn\'t take action for user ${client.userId} in group ${group} for round ${index} on document ${id} with fields`, fields, e);
