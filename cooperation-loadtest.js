@@ -81,10 +81,7 @@ function startActions(client) {
 
 function setupSubscriptions(client, group) {
   // TODO subscribe to other things like ts.rounds for load purposes
-  client.userSub = client.subscribe('users', group);
-  client.roundsSub = client.subscribe('rounds', group);
-  client.actionsSub = client.subscribe('actions', group);
-  client.gameSub = client.subscribe('games', group);
+  client.gameSub = client.subscribe('gameData', group);
 
   console.log("Subscribed to group");
 
@@ -114,7 +111,7 @@ function setupSubscriptions(client, group) {
 }
 
 function teardownSubscriptions(client) {
-  for (let x of [ "userSub", "roundsSub", "actionsSub", "gameSub"]) {
+  for (let x of [ "gameSub"]) {
     client[x] && client[x].stop();
     delete client[x];
   }
