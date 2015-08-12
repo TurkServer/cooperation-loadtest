@@ -17,11 +17,11 @@ Meteor.startup(function() {
     // Set up collections for this client
     client.users = new Mongo.Collection("users", { connection: client });
     client.LobbyStatus = new Mongo.Collection("ts.lobby", { connection: client });
+    client.Experiments = new Mongo.Collection('ts.experiments', { connection: client });
 
     // Partitioned game collections
     client.Actions = new Mongo.Collection('actions', { connection: client });
     client.Rounds = new Mongo.Collection('rounds', { connection: client });
-    client.Games = new Mongo.Collection('games', { connection: client });
 
     // Wait till we're logged in to start doing stuff
     const loginHandle = client.users.find({}).observeChanges({
@@ -56,7 +56,11 @@ function startActions(client) {
     status: {$ne: true}
   }).observeChanges({
     added: function() {
-      client.call("toggleStatus");
+      try {
+	client.call("toggleStatus");
+      } catch (e) {
+	console.log("Left lobby before we could toggle status.");
+      }
     }
   });
 
@@ -81,7 +85,9 @@ function startActions(client) {
 
 function setupSubscriptions(client, group) {
   // TODO subscribe to other things like ts.rounds for load purposes
+  // think this is taken care of now?
   client.gameSub = client.subscribe('gameData', group);
+  client.tsSub = client.subscribe('tsCurrentExperiment', group);
 
   console.log("Subscribed to group");
 
@@ -90,7 +96,7 @@ function setupSubscriptions(client, group) {
       const index = fields.index;
 
       try {
-        var maxSleep = 2000;
+        var maxSleep = 7500;
         var minSleep = 1000;
         var sleepAmt = Math.floor(Math.random() * (maxSleep - minSleep)) + minSleep;
         //sleep(sleepAmt);
@@ -103,7 +109,7 @@ function setupSubscriptions(client, group) {
     }
   });
 
-  client.endHandle = client.Games.find({state: {$in: ['abandoned', 'finished']}}).observeChanges({
+  client.endHandle = client.Experiments.find({endReason: {$exists: true}}).observeChanges({
     added: function(id, fields) {
       client.call("goToLobby");
     }
@@ -111,7 +117,7 @@ function setupSubscriptions(client, group) {
 }
 
 function teardownSubscriptions(client) {
-  for (let x of [ "gameSub"]) {
+  for (let x of [ "gameSub", "tsSub"]) {
     client[x] && client[x].stop();
     delete client[x];
   }
